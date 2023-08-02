@@ -1,0 +1,23 @@
+name: Wait for External Data
+
+on:
+  repository_dispatch:
+    types: [data-received]
+
+jobs:
+  process_data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: If passed
+        if: ${{ github.event.client_payload.passed }}
+        run: |
+          exit 0
+
+      - name: If NOT passed
+        if: ${{ !github.event.client_payload.passed }}
+        run: |
+          exit 1
