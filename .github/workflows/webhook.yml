@@ -2,6 +2,11 @@ name: Custom Check
 on:
   pull_request:
   workflow_dispatch: # This allows manual triggering of the workflow with specific inputs
+    inputs:
+      status: # Define the input parameter
+        description: "Status from external service"
+        required: true
+        default: "pending"
 
 jobs:
   custom_check:
