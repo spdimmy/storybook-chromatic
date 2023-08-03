@@ -1,23 +1,28 @@
-name: Wait for External Data
-
+name: Custom Check
 on:
-  repository_dispatch:
-    types: [data-received]
+  pull_request:
+  workflow_dispatch: # This allows manual triggering of the workflow with specific inputs
 
 jobs:
-  process_data:
+  custom_check:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: If passed
-        if: ${{ github.event.client_payload.passed }}
+      - name: Run Custom Check
+        env:
+          STATUS_FROM_EXTERNAL: ${{ github.event.inputs.status }} # Read the input value from the workflow dispatch
         run: |
-          exit 0
+          # ... Your logic to determine the status based on $STATUS_FROM_EXTERNAL ...
+          # status="success" or status="failure" or status="pending"
 
-      - name: If NOT passed
-        if: ${{ !github.event.client_payload.passed }}
-        run: |
-          exit 1
+          # Set the check status for the workflow itself based on the status value.
+          if [ "$STATUS_FROM_EXTERNAL" = "success" ]; then
+            echo "The custom check succeeded."
+          elif [ "$STATUS_FROM_EXTERNAL" = "failure" ]; then
+            echo "The custom check failed."
+            exit 1 # Exit with a non-zero status to indicate a failure
+          else
+            echo "The custom check is pending."
+          fi
