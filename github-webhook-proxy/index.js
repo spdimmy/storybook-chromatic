@@ -72,7 +72,7 @@ async function setCommitStatus(build, { repoId, name }) {
 }
 
 const app = express();
-app.use(express.text()).use((req, res, next) => {
+app.use(bodyParser.json()).use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
     "Access-Control-Allow-Headers",
