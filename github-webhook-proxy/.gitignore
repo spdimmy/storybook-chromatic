@@ -19,6 +19,11 @@
 .env.test.local
 .env.production.local
 
+# cert
+certificate.crt
+certificate.csr
+private.key
+
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

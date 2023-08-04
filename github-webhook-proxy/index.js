@@ -1,6 +1,14 @@
 const express = require("express");
+const https = require("https");
+const fs = require("fs");
+const path = require("path");
 const bodyParser = require("body-parser");
 const fetch = require("node-fetch");
+
+const options = {
+  key: fs.readFileSync(path.resolve("private.key")),
+  cert: fs.readFileSync(path.resolve("certificate.crt")),
+};
 
 const { REST_API, TOKEN } = process.env;
 
@@ -93,4 +101,7 @@ app.post("/webhook", async (req, res) => {
 });
 
 const { PORT = 3000 } = process.env;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
+https.createServer(options, app).listen(PORT, () => {
+  console.log(`HTTPS server is running on port ${PORT}`);
+});
