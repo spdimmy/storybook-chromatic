@@ -83,7 +83,7 @@ app.post("/webhook", async (req, res) => {
   const { event, build } = req.body;
   const { repoId, name } = req.query;
 
-  console.log("req happend");
+  console.log("req happend", req.body);
 
   if (event === "build-status-changed") {
     await setCommitStatus(build, { repoId, name });
