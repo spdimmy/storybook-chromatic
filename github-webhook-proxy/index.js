@@ -80,7 +80,14 @@ async function setCommitStatus(build, { repoId, name }) {
 }
 
 const app = express();
-app.use(bodyParser.json());
+app.use(bodyParser.json()).use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
 
 app.get("/webhook", async (req, res) => {
   console.log(1111);
