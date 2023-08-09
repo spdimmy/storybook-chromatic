@@ -1,18 +1,17 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const fetch = require("node-fetch");
+import "dotenv/config";
+import express from "express";
+import bodyParser from "body-parser";
+import fetch from "node-fetch";
 
-const { REST_API, TOKEN } = process.env;
+const { REST_API, TOKEN, REPO, PORT = 3000 } = process.env;
 
 function getStatus(build) {
   switch (build.status) {
     case "FAILED":
       return {
         state: "error",
-        description:
-          "Build ${build.number} has suffered a system error. Please try again.",
+        description: `Build ${build.number} has suffered a system error. Please try again.`,
       };
-
     case "BROKEN":
       return {
         state: "failure",
@@ -38,34 +37,32 @@ function getStatus(build) {
         state: "success",
         description: `Build ${build.number} passed unchanged.`,
       };
+    default:
+      return {
+        state: "pending",
+        description: `Build ${build.number} passed unchanged.`,
+      };
   }
-
-  return {
-    context: "UI Tests",
-  };
 }
 
-async function setCommitStatus(build, { repoId, name }) {
+async function setCommitStatus(build) {
   const status = getStatus(build);
 
   const body = JSON.stringify({
-    context: name ? `UI Tests (${name})` : "UI Tests",
+    context: "UI Tests",
     target_url: build.webUrl,
     ...status,
   });
 
-  console.log(
-    `POSTING to ${REST_API}repositories/${repoId}/statuses/${build.commit}`
-  );
+  const endPoint = `${REST_API}repos/${REPO}/statuses/${build.commit}`;
 
-  const result = await fetch(
-    `${REST_API}repositories/${repoId}/statuses/${build.commit}`,
-    {
-      method: "POST",
-      body,
-      headers: { Authorization: `Bearer ${TOKEN}` },
-    }
-  );
+  console.log(`POSTING to ${endPoint}`);
+
+  const result = await fetch(endPoint, {
+    method: "POST",
+    body,
+    headers: { Authorization: `Bearer ${TOKEN}` },
+  });
 
   console.log(result);
   console.log(await result.text());
@@ -88,17 +85,12 @@ app.get("/webhook", async (req, res) => {
 
 app.post("/webhook", async (req, res) => {
   const { event, build } = req.body;
-  const { repoId, name } = req.query;
 
-  console.log("req happend", req.body);
-
-  if (event === "build-status-changed") {
-    await setCommitStatus(build, { repoId, name });
+  if (event === "build") {
+    await setCommitStatus(build);
   }
 
   res.end("OK");
 });
-
-const { PORT = 3000 } = process.env;
 
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
