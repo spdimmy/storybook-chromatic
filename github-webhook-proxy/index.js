@@ -7,7 +7,8 @@ const { REST_API, TOKEN, REPO, PORT = 3000 } = process.env;
 
 function getStatus(build) {
   switch (build.status) {
-    case "FAILED" | "CANCELLED":
+    case "CANCELLED":
+    case "FAILED":
       return {
         state: "error",
         description: `Build ${build.number} has suffered a system error. Please try again.`,
@@ -37,7 +38,9 @@ function getStatus(build) {
         state: "success",
         description: `Build ${build.number} passed unchanged.`,
       };
-    case "PUBLISHED" | "PREPARED" | "IN_PROGRESS":
+    case "PUBLISHED":
+    case "PREPARED":
+    case "IN_PROGRESS":
       return {
         state: "pending",
         description: `Build ${build.number} is being processed.`,

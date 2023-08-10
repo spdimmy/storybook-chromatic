@@ -20,7 +20,7 @@ export default {
 export const Primary = {
   args: {
     primary: true,
-    label: "B1111",
+    label: "B1111 1243423",
   },
 };
 
