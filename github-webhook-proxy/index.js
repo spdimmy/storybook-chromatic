@@ -7,7 +7,7 @@ const { REST_API, TOKEN, REPO, PORT = 3000 } = process.env;
 
 function getStatus(build) {
   switch (build.status) {
-    case "FAILED":
+    case "FAILED" | "CANCELLED":
       return {
         state: "error",
         description: `Build ${build.number} has suffered a system error. Please try again.`,
@@ -37,10 +37,15 @@ function getStatus(build) {
         state: "success",
         description: `Build ${build.number} passed unchanged.`,
       };
-    default:
+    case "PUBLISHED" | "PREPARED" | "IN_PROGRESS":
       return {
         state: "pending",
-        description: `Build ${build.number} passed unchanged.`,
+        description: `Build ${build.number} is being processed.`,
+      };
+    default:
+      return {
+        state: "error",
+        description: `Build ${build.number} has exceptional status.`,
       };
   }
 }
@@ -64,8 +69,8 @@ async function setCommitStatus(build) {
     headers: { Authorization: `Bearer ${TOKEN}` },
   });
 
-  console.log(result);
-  console.log(await result.text());
+  // console.log(result);
+  // console.log(await result.text());
 }
 
 const app = express();
@@ -85,6 +90,8 @@ app.get("/webhook", async (req, res) => {
 
 app.post("/webhook", async (req, res) => {
   const { event, build } = req.body;
+
+  console.log("status", build.status);
 
   if (event === "build") {
     await setCommitStatus(build);
