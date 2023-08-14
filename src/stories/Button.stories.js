@@ -20,20 +20,20 @@ export default {
 export const Primary = {
   args: {
     primary: true,
-    label: "Button TEst",
+    label: "B1111 1243423",
   },
 };
 
 export const Secondary = {
   args: {
-    label: "Button",
+    label: "Button 43242342",
   },
 };
 
 export const Large = {
   args: {
     size: "large",
-    label: "Button",
+    label: "Button 1111",
   },
 };
 
